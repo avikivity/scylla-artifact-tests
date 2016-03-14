@@ -254,14 +254,15 @@ class ScyllaArtifactSanity(Test):
             for line in lines:
                 if 'Exception in thread' in line:
                     self.fail('cassandra-stress: %s' % line.strip())
+        timeout = 180
         cassandra_stress_exec = path.find_command('cassandra-stress')
         stress_populate = ('%s write n=1000000 -mode cql3 native' %
                            cassandra_stress_exec)
-        result_populate = process.run(stress_populate)
+        result_populate = process.run(stress_populate, timeout=timeout)
         check_output(result_populate)
         stress_mixed = ('%s mixed duration=2m -mode cql3 native '
                         '-rate threads=100' % cassandra_stress_exec)
-        result_mixed = process.run(stress_mixed)
+        result_mixed = process.run(stress_mixed, timeout=timeout)
         check_output(result_mixed)
 
     def get_scylla_logs(self):
@@ -279,7 +280,8 @@ class ScyllaArtifactSanity(Test):
     def run_nodetool(self):
         nodetool_exec = path.find_command('nodetool')
         nodetool = '%s status' % nodetool_exec
-        process.run(nodetool)
+        timeout = 180
+        process.run(nodetool, timeout=timeout)
 
     def test_after_install(self):
         try:
