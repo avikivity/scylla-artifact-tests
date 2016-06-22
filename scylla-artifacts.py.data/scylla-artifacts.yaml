@@ -1,5 +1,7 @@
 # If testing the Scylla AMI, ami should be set to 'true'
 ami: false
+# If testing the Scylla Docker, docker should be set to 'true'
+docker: false
 # Testing mode for non AMI. As of this writing, it can be
 # '1.0', '1.1', 'unstable', 'ci'. If omitted, defaults to 'ci'
 mode: 'ci'
