@@ -5,6 +5,7 @@ import re
 import logging
 import threading
 import datetime
+from collections import Counter
 from pkg_resources import parse_version
 try:
     from check_version import CheckVersionDB
@@ -676,6 +677,7 @@ class ScyllaArtifactSanity(Test):
     uuid = None
     repoid = None
     version = None
+    log = logging.getLogger('avocado.test')
 
     def get_setup_file_done(self):
         tmpdir = os.path.dirname(self.workdir)
@@ -782,6 +784,37 @@ class ScyllaArtifactSanity(Test):
         nodetool = '%s status' % nodetool_exec
         process.run(nodetool)
 
+    def verify_nvme_irq(self):
+        content = file('/proc/interrupts').readlines()
+        cpu_num = len(content[0].split())
+        irq_info = []
+        result = []
+        max_count = 0
+
+        for line in [line.split() for line in content if 'nvme' in line]:
+            irq_num = line[0][:-1]
+            irq_count_list = [int(i) for i in line[1:cpu_num+1]]
+            irq_name = line[-1]
+            self.log.debug(irq_count_list)
+            max_count = max(irq_count_list + [max_count])
+            irq_info.append([irq_num, irq_name])
+            result.append(irq_count_list)
+        self.log.debug('max_count is %d' % max_count)
+
+        big_list = []
+        for idx, irq_count_list in enumerate(result):
+            new_list = []
+            for c_idx, i in enumerate(irq_count_list):
+                if i < max_count * 0.15: # ignore small count
+                    new_list.append(0)
+                else:
+                    big_list.append(c_idx)
+                    new_list.append(i)
+            self.log.debug(irq_info[idx], new_list)
+            assert Counter(new_list)[0] >= cpu_num - 1, 'One nvme IRQ can only be pined to one vcpu'
+            cc = Counter(big_list)
+        assert len(Counter(Counter(big_list).values())) == 1, 'The IRQs pined to each vcpu should be same.'
+
     def test_after_install(self):
         self.run_nodetool()
         self.run_cassandra_stress()
@@ -808,6 +841,7 @@ class ScyllaArtifactSanity(Test):
             assert self.cvdb.check_new_record_v2("select * from housekeeping.checkversion where ruid='{}' and repoid='{}' and version like '{}%' and statuscode='r'".format(self.uuid, self.repoid, version), last_id)
         self.run_nodetool()
         self.run_cassandra_stress()
+        self.verify_nvme_irq()
 
 
 if __name__ == '__main__':
