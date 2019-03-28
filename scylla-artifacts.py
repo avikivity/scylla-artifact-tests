@@ -494,6 +494,10 @@ class ScyllaInstallUbuntu1804(ScyllaInstallDebian):
 
 
 class ScyllaInstallDebian8(ScyllaInstallDebian):
+    def __init__(self, sw_repo):
+        process.run("sed -i -e 's/jessie-updates/stable-updates/g' /etc/apt/sources.list", shell=True)
+        super(ScyllaInstallDebian8, self).__init__(sw_repo)
+
     def prepare_extend_repo(self):
         process.run("echo 'deb http://archive.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/jessie-backports.list", shell=True)
         process.run("echo 'Acquire::Check-Valid-Until \"false\";' > /etc/apt/apt.conf.d/99jessie-backports", shell=True)
