@@ -550,6 +550,7 @@ class ScyllaInstallCentOS(ScyllaInstallGeneric):
     def __init__(self, sw_repo):
         super(ScyllaInstallCentOS, self).__init__(sw_repo)
         self.sw_repo_dst = '/etc/yum.repos.d/scylla.repo'
+        process.run('sudo yum install -y python36-PyYAML', verbose=True)
 
     def _centos_remove_system_packages(self):
         self.sw_manager.remove('boost-thread')
