@@ -158,7 +158,7 @@ class ScyllaDocker(object):
                 continue
             elif line.startswith('END'):
                 break
-            if start:
+            if start and line.strip():
                 try:
                     res = line.split(':')
                     key = res[0].strip()
