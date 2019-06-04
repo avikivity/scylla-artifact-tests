@@ -1,0 +1,18 @@
+## Avocado functional requirements
+## SSH lib (avocado.utils.remote)
+fabric==2.4.0
+## multiplexer (avocado.core.tree)
+PyYAML==3.13
+## vm plugin (avocado.core.plugins.vm)
+libvirt-python==4.9.0
+## .tar.xz support (avocado.utils.archive)
+#pyliblzma>=0.5.3
+## HTML report plugin (avocado.core.plugins.htmlresult)
+pystache==0.5.4
+## REST client (avocado.core.restclient)
+requests==2.20.0
+## stevedore for loading "new style" plugins
+## stevedore-1.11.0 won't support python2.6 anymore
+stevedore==1.11.0
+cassandra-driver==3.13
+avocado-framework==36.4
