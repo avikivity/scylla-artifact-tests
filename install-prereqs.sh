@@ -1,4 +1,4 @@
-yum install -y epel-release libvirt libvirt-devel pkgconfig gcc
+yum install -y epel-release libvirt libvirt-devel pkgconfig gcc git python-devel
 yum install -y python-pip
 pip install --upgrade pip
 pip install https://github.com/amoskong/avocado-ec2.git
