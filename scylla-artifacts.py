@@ -225,7 +225,7 @@ class ScyllaServiceManager(object):
         except path.CmdNotFoundError:
             result = process.run('cat /var/log/syslog | grep scylla', shell=True,
                                  ignore_status=True)
-        error_list = ['I/O Scheduler is not properly configured!', 'Failed to start Scylla Server', 'Failed to write into /proc/irq']
+        error_list = ['I/O Scheduler is not properly configured!', 'Failed to start Scylla Server', 'failed to write into /proc/irq']
         for err in error_list:
             if err in result.stdout:
                 raise StartServiceError('Fail to start scylla-server, err: %s' % err)
