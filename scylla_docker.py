@@ -47,7 +47,7 @@ class ScyllaDocker(object):
         images = self._cmd('images -f "dangling=true" -q')
         if images:
             images_str = ' '.join(images.split())
-            self._cmd('rmi "{}"'.format(images_str), timeout=90)
+            self._cmd('rmi {}'.format(images_str), timeout=90)
 
     def update_image(self):
         log.debug('update scylla image')
