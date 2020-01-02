@@ -529,6 +529,21 @@ class ScyllaInstallDebian9(ScyllaInstallDebian):
         return [self.scylla_pkg()]
 
 
+class ScyllaInstallDebian10(ScyllaInstallDebian):
+    def prepare_extend_repo(self):
+        process.run("apt-get install gnupg1-curl dirmngr -y")
+        process.run("apt-key adv --fetch-keys https://download.opensuse.org/repositories/home:/scylladb:/scylla-3rdparty-buster/Debian_10.0/Release.key")
+        process.run("sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 17723034C56D4B19")
+        process.run("echo 'deb http://download.opensuse.org/repositories/home:/scylladb:/scylla-3rdparty-buster/Debian_10.0/ /' > /etc/apt/sources.list.d/scylla-3rdparty.list")
+
+    def env_setup(self):
+        self.download_scylla_repo()
+        self.prepare_extend_repo()
+        process.run('sudo apt-get update')
+        self.sw_manager.upgrade()
+        return [self.scylla_pkg()]
+
+
 class ScyllaInstallFedora(ScyllaInstallGeneric):
 
     def __init__(self, sw_repo):
@@ -710,6 +725,8 @@ class ScyllaArtifactSanity(Test):
                     detected_distro.version == '8')
         debian_9 = (detected_distro.name.lower() == 'debian' and
                     detected_distro.version == '9')
+        debian_10 = (detected_distro.name.lower() == 'debian' and
+                     detected_distro.version == '10')
         centos_7 = (detected_distro.name.lower() in ['centos', 'redhat'] and
                     detected_distro.version == '7')
 
@@ -732,6 +749,9 @@ class ScyllaArtifactSanity(Test):
 
         elif debian_9:
             installer = ScyllaInstallDebian9(sw_repo=sw_repo)
+
+        elif debian_10:
+            installer = ScyllaInstallDebian10(sw_repo=sw_repo)
 
         elif fedora_22:
             installer = ScyllaInstallFedora22(sw_repo=sw_repo)
