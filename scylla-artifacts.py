@@ -84,8 +84,6 @@ class ScyllaAptBackend(AptBackend):
         super(ScyllaAptBackend, self).__init__()
         executable = utils_path.find_command('apt-get')
         self.base_command = executable + ' --yes'
-        if TEST_PARAMS.get('allow_unauth', default=False):
-            self.base_command += ' --allow-unauthenticated'
 
     def upgrade(self, name=None):
         """
