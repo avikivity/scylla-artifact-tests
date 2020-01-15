@@ -558,6 +558,12 @@ class ScyllaInstallCentOS(ScyllaInstallGeneric):
         self.sw_manager.remove('boost-system')
         self.sw_manager.remove('abrt')
 
+    def env_setup(self):
+        self._centos_remove_system_packages()
+        self.download_scylla_repo()
+        self.sw_manager.upgrade()
+        return [self.scylla_pkg()]
+
     def scylla_pkg(self):
         """
         Get package name, compat both of scylla and scylla-enterprise.
@@ -566,15 +572,6 @@ class ScyllaInstallCentOS(ScyllaInstallGeneric):
             result = process.run('sudo yum search scylla-enterprise')
             self.is_enterprise = True if 'scylla-enterprise.x86_64' in result.stdout else False
         return 'scylla-enterprise' if self.is_enterprise else 'scylla'
-
-
-class ScyllaInstallCentOS7(ScyllaInstallCentOS):
-
-    def env_setup(self):
-        self._centos_remove_system_packages()
-        self.download_scylla_repo()
-        self.sw_manager.upgrade()
-        return [self.scylla_pkg()]
 
 
 class ScyllaInstallAMI(ScyllaInstallGeneric):
@@ -717,6 +714,8 @@ class ScyllaArtifactSanity(Test):
                      detected_distro.version == '10')
         centos_7 = (detected_distro.name.lower() in ['centos', 'redhat'] and
                     detected_distro.version == '7')
+        centos_8 = (detected_distro.name.lower() in ['centos', 'redhat'] and
+                    detected_distro.version == '8')
 
         installer = None
 
@@ -745,7 +744,9 @@ class ScyllaArtifactSanity(Test):
             installer = ScyllaInstallFedora22(sw_repo=sw_repo)
 
         elif centos_7:
-            installer = ScyllaInstallCentOS7(sw_repo=sw_repo)
+            installer = ScyllaInstallCentOS(sw_repo=sw_repo)
+        elif centos_8:
+            installer = ScyllaInstallCentOS(sw_repo=sw_repo)
 
         else:
             self.skip('Unsupported OS: %s' % detected_distro)
