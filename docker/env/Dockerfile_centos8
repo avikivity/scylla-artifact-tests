@@ -1,0 +1,11 @@
+FROM centos:8
+
+ADD avocado-requirements.txt avocado-requirements.txt
+RUN yum install epel-release -y
+RUN yum update -y
+RUN yum install -y sudo gcc openssl-devel python2-devel xz-devel python2-pip libvirt libvirt-devel pkgconfig gdb-gdbserver git
+RUN pip2 install -r avocado-requirements.txt
+RUN pip2 install avocado-framework==36.4
+ADD requirements-python.txt requirements-python.txt
+RUN pip2 install setuptools==40.8.0
+RUN grep -v '^#' requirements-python.txt | xargs -t -L 1 pip2 install
