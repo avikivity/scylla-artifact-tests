@@ -390,8 +390,12 @@ class ScyllaInstallGeneric(object):
         # verify ntp
         if is_debian_variant:
             process.run('service ntp status')
-        else:
-            process.run('systemctl status ntpd')
+        elif distro_name in ['centos', 'redhat']:
+            if distro_version == '7':
+                process.run('systemctl status ntpd')
+            else:
+                process.run('systemctl status chronyd')
+
         # verify coredump setup
         if self.is_systemd() and 'debian' not in distro_name:
             result = process.run('coredumpctl info', ignore_status=True)
